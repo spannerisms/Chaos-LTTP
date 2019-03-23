@@ -112,7 +112,7 @@ cheat_pool:
 	dw CrazyPalettes, !seconds_60 ; 0x11
 	dw InvertDPad, !seconds_30 ; 0x12
 	dw DashWindup, !seconds_60 ; 0x13
-	dw BubbleAttack, !seconds_2 ; 0x14
+	dw BubbleAttack, !seconds_120 ; 0x14
 	dw DropBombs, !seconds_40 ; 0x15
 	dw SignGuy, !seconds_40 ; 0x16
 	dw Blackout, !seconds_60 ; 0x17
@@ -449,7 +449,7 @@ BubbleAttack:
 	; some are kind of already covered by the above "action checks"
 	; but it's better safe than sorry
 	.nexttranscheck
-		CMP.l DontTransform, Y : BEQ .donttrans
+		CMP DontTransform, Y : BEQ .donttrans
 		DEY : BPL .nexttranscheck
 	.transformable
 		LDA $0DD0, X : CMP #$09 : BEQ .activesprite
