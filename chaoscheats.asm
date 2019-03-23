@@ -423,22 +423,55 @@ CrazyPalettes:
 	.done
 		RTS
 
+DontTransform:
+	db $1C ; boss explosions
+	db $2C ; don't hide the lumber faces
+	db $6C ; mirror portal
+	db $AB ; crystal maiden
+	db $B6 ; kiki
+	db $E4 ; keys
+	db $E5 ; big key
+	db $ED ; somaria platform, just too cruel
+	db $EA ; collectable items (doesn't cover quake but who cares)
+
 BubbleAttack:
 	JSR DecrementTimer_Play : BEQ .done
-	PHX
+	LDA $02E4 ; if we can't move, don't do anything
+	ORA $0B7B ; ditto
+	ORA $0FFC : BNE .done ; if we can't use menu, don't do anythng
+	PHX ; we only need a push/pull inside the cheat to set it off immediately
+
 	LDX #$0F
 	.nextsprite
-		LDA $0DD0, X : CMP #$09 : BCC .notactive
+		LDY #$08
+		LDA $0E20, X
+	; make sure we don't transform certain sprites
+	; some are kind of already covered by the above "action checks"
+	; but it's better safe than sorry
+	.nexttranscheck
+		CMP.l DontTransform, Y : BEQ .donttrans
+		DEY : BPL .nexttranscheck
+	.transformable
+		LDA $0DD0, X : CMP #$09 : BEQ .activesprite
+		; we don't want to compare to $0A or we get a dumb invisible sprite
+		CMP #$0B : BNE .notactive
+	.activesprite
 		LDA #$40
 		STA $01
 		JSL $06EA20 ; Sprite_ApplySpeedTowardsPlayerLong
 		LDA $00 : STA $0D40, X
 		LDA $01 : STA $0D50, X
+		LDA #$15 : STA $0E20, X ; set to anti fairies
 		LDA #$FF : STA $0E50, X ; health
 		LDA #$09 : STA $0DD0, X ; active
-		LDA #$15 : STA $0E20, X ; anti fairies
 		; collision stuff, not alive for puzzles, bounce off screen
 		LDA #$E0 : STA $0F60, X
+		STZ $0B6B, X ; tile collision stuff
+		STZ $0CAA, X ; deflection stuff
+		LDA #$04 : STA $0CD2, X ; bump damage
+		STA $0E40 ; happen to also want $04 here
+		LDA #$80 : STA $0BE0, X ; more collision type stuff
+	.donttrans
 	.notactive
 		DEX : BPL .nextsprite
 
