@@ -335,8 +335,8 @@ InfiniteBonk:
 HealthDrain:
 	JSR DecrementTimer_Play : BEQ .done
 	LDA $02 : BNE .done ; only want low byte
-	; add 8 damage just in case we're hit same frame
-	LDA #$08 : !ADD $0373 : STA $0373
+	; add damage just in case we're hit same frame
+	LDA #$04 : !ADD $0373 : STA $0373
 
 	.done
 		RTS
