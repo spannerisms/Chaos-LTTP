@@ -43,14 +43,8 @@ JSL DoCrazyZStuff : NOP #4
 org $07E34F ; dumb other stuff (velocity?)
 JSL OtherZStuff : NOP #4
 
-;org $07D234 ; icy floors
-;JSL IcyEverywhere : NOP
-
 org $06EFD6 ; enemy deaths
 JSL FreezeMeMaybe : NOP
-
-;org $06F034 ; explosions
-;JSL ASPLODE : NOP
 
 org $099FA6 ; sign guy's dialog timer
 dw $012C ; 5 seconds

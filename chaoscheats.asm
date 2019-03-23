@@ -899,30 +899,6 @@ InvertDPadMaybe:
 		RTL
 
 ; ========================================================
-; IcyFloors + tile collision replacement
-; ========================================================
-;IcyFloors:
-;	JSR DecrementTimer_Play : BEQ .done
-;	CMP #$02 : BNE .keepactive
-;	STZ !IcyFloors
-;	RTS
-;
-;	.keepactive
-;		LDA #$01 : STA !IcyFloors
-;
-;	.done
-;		RTS
-;
-;IcyEverywhere:
-;	LDA !IcyFloors : BEQ .vanilla
-;	LDA #$FF
-;	RTL
-;
-;	.vanilla
-;		LDA $02F7 : AND #$11
-;		RTL
-
-; ========================================================
 ; Long dash windup
 ; ========================================================
 DashWindup:
