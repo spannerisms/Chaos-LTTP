@@ -100,8 +100,8 @@ db $F8, $FF, $FF, $FF
 org $1CBEFF ; Sign guy text
 db $D8, $BC, $BE, $B9, $C8, $FF, $FE, $6A, $C6, $FF
 
-; YOU'RE A
-; NUMPTY.
+; YOU ARE A
+;  NUMPTY.
 org $1CEF09
 db $FF, $FF, $C2, $B8, $BE, $FF, $AA, $BB, $AE, $FF, $AA, $FF, $FF
 db $F8
