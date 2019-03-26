@@ -1,9 +1,6 @@
-!SEED_X = $7C
-!SEED_Y = $7E
+!chaostimer = $35 ; [0x02]
 
-!chaostimer = $35
-
-; 0230[0x50]
+; $0230[0x50] is free ram
 !chaos_cheat_timers = $0230 ; [0x0A]
 !chaos_cheat_ids = $023A ; [0x05]
 !BlueRupees = $0240

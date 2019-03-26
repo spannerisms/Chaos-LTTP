@@ -18,9 +18,11 @@ ChaosInit:
 NewFrame:
 	JSL $0080B5 ; Module_MainRouting
 
+	LDA $F2
 	LDA $7EF3C5 : BEQ .quit ; no cheats until uncle
 	PHB : PHK : PLB
 	PHA : PHX : PHY : PHP
+	
 	REP #$20
 
 	DEC !chaostimer : BMI .stupidgame
@@ -47,49 +49,12 @@ TryAgainHard:
 
 DoNothing: RTS
 
-; seed on every pre-file select
-; hopefully it's random enough to work well
-InitializePRNG:
-	SEP #$30
-	LDX #$01
-	LDA $2137 : STA !SEED_X
-	LDA $7003D9 : STA !SEED_X, X
-	LDA $2138 : STA !SEED_Y
-	LDA $1A : STA !SEED_Y, X
-	REP #$30 : STZ $00
-	RTL
-
 UncleSetTimer:
 	PHP : REP #$20
 	LDA !seconds_5 : STA !chaostimer
 	PLP
 	LDA #$00 : STA $7EF3CC
 	RTL
-
-; xorshift courtesy of total
-RandomCheatInt:
-	PHP
-	REP #$20
-	LDA !SEED_X
-	ASL #5
-	EOR !SEED_X
-	STA $05
-
-	LDA !SEED_Y
-	STA !SEED_X
-
-	LDA $05
-	LSR #3
-	EOR $05
-	STA $05
-
-	LDA !SEED_Y
-	LSR
-	EOR !SEED_Y
-	EOR $05
-	STA !SEED_Y
-
-	PLP : RTL
 
 cheat_pool:
 	dw DoNothing, $0000 ; 0x00
@@ -128,14 +93,7 @@ cheat_pool:
 
 SetACheat:
 	SEP #$30
-
-	LDA $22 : EOR !SEED_Y
-	STA !SEED_X ; idk why not
-	LDA $0FA1 : STA !SEED_Y
-
-	REP #$10
-	LDX #$0004 ; find out if we have any free slots first
-	SEP #$10
+	LDX #$04 ; find out if we have any free slots first
 
 	.nextindex
 		LDA !chaos_cheat_ids, X : BEQ .chooserandomcheat
@@ -144,7 +102,7 @@ SetACheat:
 
 	.chooserandomcheat
 		LDY #$04
-		JSL RandomCheatInt
+		JSL RandomXORInt
 		AND #$1F ; we need 32 cheats for clean modulo
 		INC A ; but we want 33 table entries to ignore 0
 
@@ -352,8 +310,8 @@ RandomHeldItem:
 	JSR DecrementTimer_PlayAndMenu : BEQ .done
 	LDA $1A : AND #$07 : BNE .done
 	.chooserandomnumber
-		JSL RandomCheatInt : AND #$0F : STA $00 ; number 0-16
-		JSL RandomCheatInt : AND #$03 ; number 0-4
+		JSL RandomXORInt : AND #$0F : STA $00 ; number 0-16
+		JSL RandomXORInt : AND #$03 ; number 0-4
 		ADC $00 ; for a number 0-19
 		CMP #$10 : BEQ .chooserandomnumber ; avoid bottles
 	STA $0202 : LDA #$02 : STA $0303
@@ -381,8 +339,8 @@ facing:
 ChangeDashDirections:
 	JSR DecrementTimer_Play : BEQ .done
 	LDA $5D : CMP #$11 : BNE .done
-	JSL RandomCheatInt : AND #$1F : BNE .done
-	JSL RandomCheatInt : AND #$03 : TAX
+	JSL RandomXORInt : AND #$1F : BNE .done
+	JSL RandomXORInt : AND #$03 : TAX
 	LDA facing, X : STA $2F
 
 	.done
@@ -393,7 +351,7 @@ MirrorRandomly:
 	REP #$20
 	LDA $02 : CMP !seconds_40 : BEQ .mirror ; mirror once at the start
 	CMP !seconds_2 : BNE .done ; only one more mirror, at the end
-	JSL RandomCheatInt : AND #$0003 : BNE .done ; only mirror a 2nd time 1/4
+	JSL RandomXORInt : AND #$0003 : BNE .done ; only mirror a 2nd time 1/4
 	.mirror
 		SEP #$20
 		LDA $040C : PHA ; remember current dungeon ID
@@ -414,9 +372,9 @@ CrazyPalettes:
 	PHX
 	LDY.w #$0008
 	.loop
-		JSL RandomCheatInt : AND.w #$00FF ; 0-255
+		JSL RandomXORInt : AND.w #$00FF ; 0-255
 		ASL A : TAX ; since colors are words
-		JSL RandomCheatInt
+		JSL RandomXORInt
 		STA $7EC500, X
 		DEY : BNE .loop
 
@@ -555,7 +513,7 @@ RandomHalt:
 		LDA !halttimer : BNE .decrementtimer
 		STZ $02E4
 		STZ $4D
-		JSL RandomCheatInt
+		JSL RandomXORInt
 		CMP #$00 : BNE .done
 		LDA #$6F : STA !halttimer
 		STA $031F
@@ -689,9 +647,9 @@ WTFHUD:
 	.keepcheat
 		REP #$30
 		LDA $02 : AND #$002F : BNE .nonewspeed
-		JSL RandomCheatInt : AND #$0007 : TAX
+		JSL RandomXORInt : AND #$0007 : TAX
 		LDA MenuSpeeds, X : STA !menuhorz
-		JSL RandomCheatInt : AND #$0007 : TAX
+		JSL RandomXORInt : AND #$0007 : TAX
 		LDA MenuSpeeds, X : STA !menuvert
 
 	.nonewspeed
@@ -740,7 +698,7 @@ Cacophones:
 Cacophony:
 	JSR DecrementTimer_Play : BEQ .done
 	LDA $02 : AND #$1F : BNE .done
-	JSL RandomCheatInt : AND #$3F
+	JSL RandomXORInt : AND #$3F
 	CMP #$20 : BCS .useset2
 	.useset1
 		AND #$1F : TAX
@@ -767,7 +725,7 @@ GetBusted:
 
 	.keepactive
 		LDA !brokengraphics : BNE .alreadyinit
-		JSL RandomCheatInt : AND #$07
+		JSL RandomXORInt : AND #$07
 		ASL : TAX
 		REP #$20
 		LDA gfx_choices, X : STA !brokengfx
@@ -983,7 +941,7 @@ SpawnRandomSprite:
 	LDA !EnemySpawn : BEQ .vanilla
 	PLA ; clear the A we pushed now, we don't care about it
 	PHX ; remember sprite index
-	JSL RandomCheatInt : AND #$3F : TAX
+	JSL RandomXORInt : AND #$3F : TAX
 	LDA.l sprite_pool, X ; load sprite ID
 	PLX ; bring X back
 	PHA ; push sprite ID chosen

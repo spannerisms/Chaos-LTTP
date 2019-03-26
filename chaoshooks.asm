@@ -1,9 +1,6 @@
 org $008056
 JSL NewFrame
 
-org $0CCCCC ; I never would have found the SRAM validation without karkat's notes lol
-JSL InitializePRNG
-
 org $00802F
 JSL ChaosInit : NOP
 
