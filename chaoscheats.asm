@@ -28,17 +28,17 @@ NewFrame:
 	BNE .reapplycheats
 	JSR SetACheat
 
-.reapplycheats
+	.reapplycheats
 	JSR ReapplyAll
 	BRA .done
 
-.stupidgame
+	.stupidgame
 	LDA !seconds_5 : STA !chaostimer
 
-.done
+	.done
 	PLP : PLY : PLX : PLA : PLB
 
-.quit
+	.quit
 	RTL
 
 TryAgainHard:
@@ -94,18 +94,18 @@ SetACheat:
 	SEP #$30
 	LDX #$04 ; find out if we have any free slots first
 
-.nextindex
+	.nextindex
 	LDA !chaos_cheat_ids, X : BEQ .chooserandomcheat
 	DEX : BPL .nextindex
 	BRA .noroom
 
-.chooserandomcheat
+	.chooserandomcheat
 	LDY #$04
 	JSL RandomXORInt
 	AND #$1F ; we need 32 cheats for clean modulo
 	INC A ; but we want 33 table entries to ignore 0
 
-.nextcheat ; no repeats allowed
+	.nextcheat ; no repeats allowed
 	CMP !chaos_cheat_ids, Y : BEQ .chooserandomcheat
 	DEY : BPL .nextcheat
 
@@ -121,10 +121,10 @@ SetACheat:
 	LDA !seconds_30 : STA !chaostimer
 	RTS
 
-.noroom
+	.noroom
 	LDA !seconds_5 : STA !chaostimer ; try again sooner
 
-.done
+	.done
 	RTS
 
 JumpToCheatFromIndex:
@@ -143,13 +143,13 @@ ReapplyAll:
 	SEP #$30
 	LDX #$04
 
-.nextcheat
+	.nextcheat
 	LDA !chaos_cheat_ids, X : BEQ .dontcheatmk
 	PHX : PHP
 	JSR JumpToCheatFromIndex
 	PLP : PLX
 
-.dontcheatmk
+	.dontcheatmk
 	DEX : BPL .nextcheat
 	RTS
 
@@ -177,7 +177,7 @@ CheatAgainSoon:
 ; (be careful when it doesn't lol)
 ; ========================================================
 DecrementTimer:
-.Play
+	.Play
 	SEP #$30
 	STZ $00
 
@@ -187,7 +187,7 @@ DecrementTimer:
 
 	BRA .decrement
 
-.PlayAndMenu
+	.PlayAndMenu
 	SEP #$30
 	STZ $00
 
@@ -196,11 +196,11 @@ DecrementTimer:
 	CMP #$07 : BNE .done
 	BRA .decrement
 
-.checkmenu
+	.checkmenu
 	CMP #$01 : BNE .done
 	LDA $10 : CMP #$0E : BNE .done
 
-.decrement
+	.decrement
 	INC $00
 	REP #$20
 	PHX : PHY
@@ -211,10 +211,10 @@ DecrementTimer:
 	TYX
 	JSR TurnOffCheat
 
-.donedec
+	.donedec
 	PLY : PLX
 
-.done
+	.done
 	SEP #$30
 	LDA $00
 	RTS
@@ -229,22 +229,26 @@ LagHard:
 	JSR DecrementTimer_decrement ; just always decrement
 	LDA $10 : CMP #$19 : BEQ .killcheat
 	CMP #$1A : BNE .letsactuallylag
-.killcheat
+
+	.killcheat
 	JSR TurnOffCheat
 	RTS
-.letsactuallylag
+
+	.letsactuallylag
 	REP #$20
 	LDA #$FC40
-.LAG_MOTHERFUCKER
+
+	.LAG_MOTHERFUCKER
 	DEC A : BNE .LAG_MOTHERFUCKER
-.done
+
+	.done
 	RTS
 
 ZappyZap:
 	JSR DecrementTimer_Play : BEQ .done
 	LDA #$01 : STA $0360
 
-.done
+	.done
 	RTS
 
 SuperBunny:
@@ -252,25 +256,25 @@ SuperBunny:
 	CMP #$02 : BNE .continue
 	LDA $5D : CMP #$17 : BNE .notwalking
 	LDA #$01 : STA $5D ; should fix itself immediately to normal walking, or bunny state if dw pearlless
-.notwalking
+	.notwalking
 	LDA $0FFF : BEQ .inLW
 	LDA $7EF357 : BEQ .nopearl
-.inLW
+	.inLW
 	STZ $02E0
-.nopearl
+	.nopearl
 	RTS
-.continue
+	.continue
 	LDA #$01 : STA $02E0
 	LDA $5D : CMP #$17 : BNE .done
 	STZ $5D ; give super bunny
-.done
+	.done
 	RTS
 
 NoSpinning:
 	JSR DecrementTimer_Play : BEQ .done
 	STZ $79
 
-.done
+	.done
 	RTS
 
 NoAnim:
@@ -279,7 +283,7 @@ NoAnim:
 	STZ $3D
 	;STZ $030B
 
-.done
+	.done
 	RTS
 
 InfiniteBonk:
@@ -289,10 +293,10 @@ InfiniteBonk:
 	STZ $0372 ; because it will happen here
 	RTS
 
-.dobonk
+	.dobonk
 	LDA #$FF : STA $0372
 
-.done
+	.done
 	RTS
 
 HealthDrain:
@@ -301,20 +305,20 @@ HealthDrain:
 	; add damage just in case we're hit same frame
 	LDA #$04 : !ADD $0373 : STA $0373
 
-.done
+	.done
 	RTS
 
 NoSword:
 	JSR DecrementTimer_Play : BEQ .done
 	LDA #$04 : STA $02E3
 
-.done
+	.done
 	RTS
 
 RandomHeldItem:
 	JSR DecrementTimer_PlayAndMenu : BEQ .done
 	LDA $1A : AND #$07 : BNE .done
-.chooserandomnumber
+	.chooserandomnumber
 	JSL RandomXORInt : AND #$0F : STA $00 ; number 0-16
 	JSL RandomXORInt : AND #$03 ; number 0-4
 	ADC $00 ; for a number 0-19
@@ -323,7 +327,7 @@ RandomHeldItem:
 	LDA $11 : BNE .done ; dont update in menu mode
 	JSL $0DDB7F ; UpdateEquippedItemLong
 
-.done
+	.done
 	RTS
 
 Numpty:
@@ -335,7 +339,7 @@ Numpty:
 	SEP #$20
 	JSL $1CFD69
 
-.done
+	.done
 	RTS
 
 facing:
@@ -348,7 +352,7 @@ ChangeDashDirections:
 	JSL RandomXORInt : AND #$03 : TAX
 	LDA facing, X : STA $2F
 
-.done
+	.done
 	RTS
 
 MirrorRandomly:
@@ -358,7 +362,7 @@ MirrorRandomly:
 	CMP !seconds_2 : BNE .done ; only one more mirror, at the end
 	JSL RandomXORInt : AND #$0003 : BNE .done ; only mirror a 2nd time 1/4
 
-.mirror
+	.mirror
 	SEP #$20
 	LDA $040C : PHA ; remember current dungeon ID
 	STZ $040C ; then set to 0 so we can mirror in caves
@@ -368,7 +372,7 @@ MirrorRandomly:
 	JSL MagicMirrorBounce
 	PLA : STA $040C ; back to our original dungeon ID
 
-.done
+	.done
 	RTS
 
 CrazyPalettes:
@@ -377,7 +381,7 @@ CrazyPalettes:
 	REP #$30
 	PHX
 	LDY.w #$0008
-.loop
+	.loop
 	JSL RandomXORInt : AND.w #$00FF ; 0-255
 	ASL A : TAX ; since colors are words
 	JSL RandomXORInt
@@ -386,7 +390,7 @@ CrazyPalettes:
 
 	INC $15
 	PLX
-.done
+	.done
 	RTS
 
 DontTransform:
@@ -408,20 +412,20 @@ BubbleAttack:
 	PHX ; we only need a push/pull inside the cheat to set it off immediately
 
 	LDX #$0F
-.nextsprite
+	.nextsprite
 	LDY #$08
 	LDA $0E20, X
 	; make sure we don't transform certain sprites
 	; some are kind of already covered by the above "action checks"
 	; but it's better safe than sorry
-.nexttranscheck
+	.nexttranscheck
 	CMP DontTransform, Y : BEQ .donttrans
 	DEY : BPL .nexttranscheck
-.transformable
+	.transformable
 	LDA $0DD0, X : CMP #$09 : BEQ .activesprite
 	; we don't want to compare to $0A or we get a dumb invisible sprite
 	CMP #$0B : BNE .notactive
-.activesprite
+	.activesprite
 	LDA #$40
 	STA $01
 	JSL $06EA20 ; Sprite_ApplySpeedTowardsPlayerLong
@@ -437,8 +441,8 @@ BubbleAttack:
 	LDA #$04 : STA $0CD2, X ; bump damage
 	STA $0E40 ; happen to also want $04 here
 	LDA #$80 : STA $0BE0, X ; more collision type stuff
-.donttrans
-.notactive
+	.donttrans
+	.notactive
 	DEX : BPL .nextsprite
 
 	PLX
@@ -446,7 +450,7 @@ BubbleAttack:
 	STZ !chaos_cheat_ids, X
 	JSL CheatAgainSoon
 
-.done
+	.done
 	RTS
 
 DropBombs:
@@ -454,10 +458,10 @@ DropBombs:
 	LDA $02 : AND #$7F : BNE .done
 	STZ $0D
 	LDA $7EF343 : BNE .placebomb
-.zerobombs
+	.zerobombs
 	INC A : STA $7EF343 ; increment bomb count to be able to place
 	LDA #$01 : STA $0D ; to say we had 0
-.placebomb
+	.placebomb
 	LDA #$07
 	JSL $09811F ; AddBlueBomb, JP1.0 valid
 	LDA #$20 : STA $039F, X ; short fuse
@@ -465,7 +469,7 @@ DropBombs:
 	LDA $0D : BNE .done
 	LDA #$00 : STA $7EF343 ; no free bombs
 
-.done
+	.done
 	RTS
 
 SignGuy:
@@ -479,7 +483,7 @@ SignGuy:
 	PLX
 	RTS
 
-.keepactive
+	.keepactive
 	LDA !Follower_Init : BNE .alreadyinitted
 	LDA $7EF3CC : STA !Follower_Cache ; cache old follower
 	LDA #$09 : STA $7EF3CC ; sign guy
@@ -489,10 +493,10 @@ SignGuy:
 	PLX
 	RTS
 
-.alreadyinitted
+	.alreadyinitted
 	LDA #$09 : STA $7EF3CC ; just keep loading him so he can't be lost
 
-.done
+	.done
 	RTS
 
 Blackout:
@@ -502,10 +506,10 @@ Blackout:
 	LDA $13 : ORA #$0F : STA $13
 	RTS
 
-.dark
+	.dark
 	LDA $13 : AND #$F0 : STA $13
 
-.done
+	.done
 	RTS
 
 RandomHalt:
@@ -515,7 +519,7 @@ RandomHalt:
 	STZ $02E4
 	RTS
 
-.stilldo
+	.stilldo
 	LDA !halttimer : BNE .decrementtimer
 	STZ $02E4
 	STZ $4D
@@ -523,11 +527,11 @@ RandomHalt:
 	CMP #$00 : BNE .done
 	LDA #$6F : STA !halttimer
 	STA $031F
-.decrementtimer
+	.decrementtimer
 	DEC !halttimer
 	LDA #$01 : STA $02E4
 
-.done
+	.done
 	RTS
 
 InvisibleLink:
@@ -536,10 +540,10 @@ InvisibleLink:
 	STZ $4B
 	RTS
 
-.stilldo
+	.stilldo
 	LDA #$0C : STA $4B
 
-.done
+	.done
 	RTS
 
 SpeedChoices:
@@ -552,10 +556,10 @@ RandomSpeed:
 	TAX
 	LDA SpeedChoices, X : STA !SpeedChoice
 	
-.keepcurrentspeed
+	.keepcurrentspeed
 	LDA !SpeedChoice : STA $5E
 
-.done
+	.done
 	RTS
 
 RandomMagic:
@@ -564,15 +568,15 @@ RandomMagic:
 	JSL GetRandomInt : AND #$7C
 	STA $7EF36E
 	
-.keepcurrent
-.done
+	.keepcurrent
+	.done
 	RTS
 
 AncillaTornado:
 	JSR DecrementTimer_Play : BEQ .done
 	LDA $02 : AND #$01 : BNE .done
 	LDX #$09
-.nextancilla
+	.nextancilla
 	LDA $0C4A, X : BEQ .skip
 	LDA #$30
 	JSL Ancilla_ProjectSpeedTowardsPlayerLong
@@ -586,9 +590,9 @@ AncillaTornado:
 	TXA : CLC : ADC #$0A : TAX
 	JSL Ancilla_MoveLong
 	PLX
-.skip
+	.skip
 	DEX : BPL .nextancilla
-.done
+	.done
 	RTS
 
 MosaicDirections:
@@ -602,10 +606,10 @@ Mosaic:
 	STZ $95
 	RTS
 
-.keepmosaic
+	.keepmosaic
 	LDA !mosaiclevel : BNE .alreadyinit
 	LDA #$03 : STA !mosaiclevel
-.alreadyinit
+	.alreadyinit
 	LDA !mosaiclevel : PHA
 	; always restore mosaic, but don't always increment
 	LDA $02 : AND #$07 : BNE .dontincrement
@@ -614,16 +618,16 @@ Mosaic:
 	PHA
 	AND #$F0 : BEQ .reversedirection
 	CMP #$F0 : BNE .dontreversedirection
-.reversedirection
+	.reversedirection
 	LDA !mosaicdirection : EOR #$01
 	STA !mosaicdirection
-.dontreversedirection
-.dontincrement
+	.dontreversedirection
+	.dontincrement
 	PLA
 	STA !mosaiclevel
 	STA $95
 
-.done
+	.done
 	RTS
 
 MenuSpeeds:
@@ -639,18 +643,18 @@ WTFHUD:
 	LDA $11 : CMP #$01 : BNE .notinmenu
 	LDA $0200 : CMP #$04 : BEQ .setmenuposition
 	CMP #$07 : BCC .shouldbefine
-.setmenuposition
+	.setmenuposition
 	REP #$20
 	LDA #$FF18 : STA $EA
 	RTS
-.shouldbefine
+	.shouldbefine
 	RTS
-.notinmenu
+	.notinmenu
 	REP #$20
 	LDA #$0000 : STA $EA
 	RTS
 
-.keepcheat
+	.keepcheat
 	REP #$30
 	LDA $02 : AND #$002F : BNE .nonewspeed
 	JSL RandomXORInt : AND #$0007 : TAX
@@ -658,7 +662,7 @@ WTFHUD:
 	JSL RandomXORInt : AND #$0007 : TAX
 	LDA MenuSpeeds, X : STA !menuvert
 
-.nonewspeed
+	.nonewspeed
 	LDA $E4 : ADC !menuhorz : STA $E4
 	LDA $10 : CMP #$010E : BNE .scrollvert ; see if we're in menu
 	SEP #$30 : LDA $0200
@@ -666,23 +670,23 @@ WTFHUD:
 	CMP #$05 : BEQ .temprestoremenupositionup
 	CMP #$04 : BEQ .scrollvert
 	RTS
-.temprestoremenupositionup
+	.temprestoremenupositionup
 	REP #$20
 	LDA #$FF18 : STA $EA
 	RTS
-.temprestoremenupositiondown
+	.temprestoremenupositiondown
 	REP #$20
 	LDA #$0000 : STA $EA
 	RTS
-.scrollvert
+	.scrollvert
 	REP #$20
 	LDA $EA : ADC !menuvert : STA $EA
-.dontdovert
-.done
+	.dontdovert
+	.done
 	RTS
 
 Cacophones:
-.set1
+	.set1
 	db $0A, $0A, $0A, $0A
 	db $0B, $0D, $0E, $0F
 	db $06, $06, $06, $06
@@ -691,7 +695,7 @@ Cacophones:
 	db $30, $30, $30, $30
 	db $30, $30, $37, $37
 	db $38, $3C, $3C, $3C
-.set2
+	.set2
 	db $01, $01, $31, $31
 	db $04, $04, $07, $07
 	db $07, $0C, $0D, $0D
@@ -706,14 +710,14 @@ Cacophony:
 	LDA $02 : AND #$1F : BNE .done
 	JSL RandomXORInt : AND #$3F
 	CMP #$20 : BCS .useset2
-.useset1
+	.useset1
 	AND #$1F : TAX
 	LDA Cacophones_set1, X : STA $012E
 	RTS
-.useset2
+	.useset2
 	AND #$1F : TAX
 	LDA Cacophones_set2, X : STA $012F
-.done
+	.done
 	RTS
 
 gfx_choices:
@@ -729,7 +733,7 @@ GetBusted:
 	LDA #$0000 : STA !brokengfx
 	RTS
 
-.keepactive
+	.keepactive
 	LDA !brokengraphics : BNE .alreadyinit
 	JSL RandomXORInt : AND #$07
 	ASL : TAX
@@ -737,10 +741,10 @@ GetBusted:
 	LDA gfx_choices, X : STA !brokengfx
 	SEP #$20
 
-.alreadyinit
+	.alreadyinit
 	LDA #$01 : STA !brokengraphics
 
-.done
+	.done
 	RTS
 
 ; ========================================================
@@ -753,11 +757,11 @@ BlueRupees:
 	LDA #$05 : STA !RupeeFloorValue
 	RTS
 
-.keepactive
+	.keepactive
 	LDA #$01 : STA !BlueRupees
 	STZ !RupeeFloorValue
 
-.done
+	.done
 	RTS
 
 BlueRupeesEverywhere:
@@ -765,7 +769,7 @@ BlueRupeesEverywhere:
 	LDA #$FF
 	RTL
 
-.vanilla
+	.vanilla
 	LDA $02F7 : AND.b #$22
 	RTL
 
@@ -778,10 +782,10 @@ StupidZCoord:
 	STZ !BrokenZ
 	RTS
 
-.keepactive
+	.keepactive
 	LDA #$01 : STA !BrokenZ
 
-.done
+	.done
 	RTS
 
 DoCrazyZStuff:
@@ -789,7 +793,7 @@ DoCrazyZStuff:
 	INC $24 : INC $24
 	RTL
 
-.vanilla
+	.vanilla
 	LDA.b #$FF
 	STA $24 : STA $25 : STA $29
 	RTL
@@ -798,7 +802,7 @@ OtherZStuff:
 	LDA !BrokenZ : BEQ .vanilla
 	RTL
 
-.vanilla
+	.vanilla
 	LDA.b #$FF
 	STA $24 : STA $25 : STA $29
 	RTL
@@ -812,10 +816,10 @@ FreezeDeath:
 	STZ !Spritecicles
 	RTS
 
-.keepactive
+	.keepactive
 	LDA #$01 : STA !Spritecicles
 
-.done
+	.done
 	RTS
 
 FreezeMeMaybe:
@@ -823,14 +827,14 @@ FreezeMeMaybe:
 	LDA $0DD0, X : CMP #$0B : BNE .freezehim
 	LDA $7FFA3C, X : BNE .vanilla ; already frozen, so unfreeze and die
 
-.freezehim
+	.freezehim
 	LDA #$01 : STA $7FFA3C, X
 	LDA #$0B : STA $0DD0, X
 	STZ $0EF0, X ; no death timer
 	LDA #$20 : STA $0E50, X ; 32 hp when frozen
 	RTL
 
-.vanilla
+	.vanilla
 	LDA.b #$06 : STA $0DD0, X
 	RTL
 
@@ -843,24 +847,24 @@ InvertDPad:
 	STZ !DPad_inv
 	RTS
 
-.keepactive
+	.keepactive
 	LDA #$80 : STA !DPad_inv
 
-.done
+	.done
 	RTS
 
 InvertDPadMaybe:
 	LDA $4219 : BIT !DPad_inv : BPL .dont
 	BIT.b #$0C : BEQ .donty
 	EOR.b #$0C
-.donty
+	.donty
 	BIT.b #$03 : BEQ .dont
 	EOR.b #$03
-.dont
+	.dont
 	STA $01
 	RTL
 
-.vanilla
+	.vanilla
 	LDA $4219 : STA $01
 	RTL
 
@@ -873,10 +877,10 @@ DashWindup:
 	STZ !longdash
 	RTS
 
-.keepactive
+	.keepactive
 	LDA #$01 : STA !longdash
 
-.done
+	.done
 	RTS
 
 IHopePeopleHateThis:
@@ -884,7 +888,7 @@ IHopePeopleHateThis:
 	LDA #$6B : STA $0374
 	RTL
 
-.vanilla
+	.vanilla
 	LDA #$1D : STA $0374
 	RTL
 
@@ -934,12 +938,12 @@ DropSprites:
 	STZ $0CFA
 	RTS
 
-.keepactive
+	.keepactive
 	LDA #$01 : STA !EnemySpawn
 	STA $0CF9 ; luck status
 	STA $0CFA ; luck kill counter (just in case)
 
-.done
+	.done
 	RTS
 
 SpawnRandomSprite:
@@ -956,9 +960,9 @@ SpawnRandomSprite:
 	LDA #$09 : STA $0DD0, X ; set active
 	LDA $0F60, X : ORA #$40 : STA $0F60, X ; count as dead
 
-.vanilla
+	.vanilla
 	PLA ; bring back sprite ID
-.setspawn
+	.setspawn
 	STA $0E20, X
 	CMP #$E5
 	RTL

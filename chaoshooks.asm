@@ -48,20 +48,20 @@ dw $012C ; 5 seconds
 
 org $07F87F ; JSL bounce to a branch in bank07
 MagicMirrorBounce:
-PHB : PHK : PLB
-JSR $A94C ; magic mirror code
-PLB : RTL
+	PHB : PHK : PLB
+	JSR $A94C ; magic mirror code
+	PLB : RTL
 
 org $08FFEF ; JSL bounces
 Ancilla_ProjectSpeedTowardsPlayerLong:
-PHB : PHK : PLB
-JSR $8EED ; Ancilla_ProjectSpeedTowardsPlayer
-PLB : RTL
+	PHB : PHK : PLB
+	JSR $8EED ; Ancilla_ProjectSpeedTowardsPlayer
+	PLB : RTL
 
 Ancilla_MoveLong:
-PHB : PHK : PLB
-JSR $908B ; Ancilla_MoveVert
-PLB : RTL
+	PHB : PHK : PLB
+	JSR $908B ; Ancilla_MoveVert
+	PLB : RTL
 
 ;------------------
 ; No room to do what I want with a JSL in Bank0D
@@ -69,23 +69,22 @@ PLB : RTL
 org $0DA478
 JSR BustedLink
 
-org $0DA483
-;JSR SwagDuckLink2
-
 org $0DAFF0
 BustedLink:
-LDA !brokengfx : BEQ .vanilla
-RTS
-.vanilla
+	LDA !brokengfx : BEQ .vanilla
+	RTS
+
+	.vanilla
 	LDA #$0E00
 	RTS
 
 SwagDuckLink2:
-LDA !brokengfx : BEQ .vanilla
-PHP : SEP #$30
-LDA #$0E : STA $0346
-PLP : RTS
-.vanilla
+	LDA !brokengfx : BEQ .vanilla
+	PHP : SEP #$30
+	LDA #$0E : STA $0346
+	PLP : RTS
+
+	.vanilla
 	STZ $0346
 	RTS
 

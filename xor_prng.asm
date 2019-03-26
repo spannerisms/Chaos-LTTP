@@ -23,8 +23,9 @@ InitializePRNG: ; already in SEP #$30 from bank0C
 	LDA !SEED_X : EOR !SEED_Y : BNE .done
 	LDA #$8927 : STA !SEED_X
 	LDA #$66A5 : STA !SEED_Y
-.alreadyinit
-.done
+
+	.alreadyinit
+	.done
 	SEP #$30
 	LDA #$01 : STA !PRNG_init
 	STZ $11 : STA $010E
@@ -39,21 +40,24 @@ AdvancePRNG_FileSelect:
 	STZ $E4 : STZ $E5
 	LDA !PRNG_init : BEQ .skipadvancement
 	JML RandomXORInt
-.skipadvancement
+
+	.skipadvancement
 	RTL
 
 ; advance PRNG every other frame in menu/textboxes
 AdvancePRNG_MessageModuleIndoors:
 	LDA $1A : AND #$01 : BNE .skip
 	JSL RandomXORInt
-.skip
+
+	.skip
 	LDA $11 : CMP #$03
 	RTL
 
 AdvancePRNG_MessageModuleOutdoors:
 	LDA $1A : AND #$01 : BNE .skip
 	JSL RandomXORInt
-.skip
+
+	.skip
 	LDA $11 : CMP #$07
 	RTL
 
@@ -63,5 +67,6 @@ AdvancePRNG_Movement:
 	EOR $22 : AND #$000F ; some random thing to test for
 	BNE .done
 	JSL RandomXORInt
-.done
+
+	.done
 	RTL
