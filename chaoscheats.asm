@@ -18,7 +18,6 @@ ChaosInit:
 NewFrame:
 	JSL $0080B5 ; Module_MainRouting
 
-	LDA $F2
 	LDA $7EF3C5 : BEQ .quit ; no cheats until uncle
 	PHB : PHK : PLB
 	PHA : PHX : PHY : PHP
