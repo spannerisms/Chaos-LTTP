@@ -323,8 +323,7 @@ RandomHeldItem:
 	JSL RandomXORInt : AND #$03 ; number 0-4
 	ADC $00 ; for a number 0-19
 	CMP #$10 : BEQ .chooserandomnumber ; avoid bottles
-	STA $0202 : LDA #$02 : STA $0303
-	LDA $11 : BNE .done ; dont update in menu mode
+	STA $0202
 	JSL $0DDB7F ; UpdateEquippedItemLong
 
 	.done

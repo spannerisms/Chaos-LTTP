@@ -63,7 +63,6 @@ Ancilla_MoveLong:
 	JSR $908B ; Ancilla_MoveVert
 	PLB : RTL
 
-;------------------
 ; No room to do what I want with a JSL in Bank0D
 ; but enough room in unused space to JSR
 org $0DA478
@@ -91,6 +90,7 @@ SwagDuckLink2:
 ; ========================================================
 ; Custom text
 ; ========================================================
+
 ; AW, HELL NO!
 org $1C805C ; can't enter with follower text
 db $AA, $C0, $C8, $FF, $B1, $AE, $B5, $B5, $FF, $B7, $B8, $C7
