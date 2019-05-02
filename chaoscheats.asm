@@ -67,7 +67,7 @@ cheat_pool:
 	dw DropSprites, !seconds_20 ; 0x08
 	dw LagHard, !seconds_2 ; 0x09
 	dw RandomHeldItem, !seconds_30 ; 0x0A
-	dw Numpty, !seconds_30 ; 0x0B
+	dw Doofer, !seconds_30 ; 0x0B
 	dw StupidZCoord, !seconds_30 ; 0x0C
 	dw GetBusted, !seconds_60 ; 0x0D
 	dw NoAnim, !seconds_40 ; 0x0E
@@ -329,10 +329,10 @@ RandomHeldItem:
 	.done
 	RTS
 
-Numpty:
+Doofer:
 	JSR DecrementTimer_Play : BEQ .done
 	REP #$20
-	LDA $02 : AND.w #$01FF : BNE .done ; numpty every 512 frames (~8.5s)
+	LDA $02 : AND.w #$01FF : BNE .done ; every 512 frames (~8.5s)
 
 	LDA.w #$0178 : STA $1CF0
 	SEP #$20
